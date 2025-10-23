@@ -1,23 +1,24 @@
 import { CreateChallengeDto } from "../dto/create-challenge.dto";
 import { ChallengeRepositoryPort } from "../../domain/repository/challenge.repository.port";
 import { Challenge } from "../../domain/entity/challenge.entity";
+import { ChallengeDifficulty } from "../../domain/enums/challenge-difficulty";
+import { ChallengeStatus } from "../../domain/enums/challenge-status";
 
 export class CreateChallengeUsecase {
     constructor(private readonly challengeRepository: ChallengeRepositoryPort) {}
 
-    async execute(input: CreateChallengeDto): Promise<CreateChallengeDto> {
+    async execute(input: CreateChallengeDto): Promise<Challenge> {
         const challenge = new Challenge(
             0, 
             input.title, 
-            input.difficulty, 
+            input.description, 
+            input.difficulty as ChallengeDifficulty, 
             input.tags, 
             input.timeLimit, 
             input.memoryLimit, 
-            input.status, 
-            input.description, 
+            input.status as ChallengeStatus, 
             input.creatorId);
-            
-        await this.challengeRepository.create(challenge);
-        return challenge;
+
+        return await this.challengeRepository.create(challenge);
     }
 }

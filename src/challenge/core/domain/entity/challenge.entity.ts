@@ -5,12 +5,12 @@ export class Challenge {
     constructor(
         public readonly id: number,
         public title: string,
+        public description: string,
         public difficulty: ChallengeDifficulty,
         public tags: string[],
         public timeLimit: number,
         public memoryLimit: number,
         public status: ChallengeStatus,
-        public description: string,
         public creatorId: number,
     ) {}
 }

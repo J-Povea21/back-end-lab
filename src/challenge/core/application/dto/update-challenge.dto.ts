@@ -10,4 +10,5 @@ export class UpdateChallengeDto {
     timeLimit: number;
     memoryLimit: number;
     status: ChallengeStatus;
+    creatorId: number;
 }
