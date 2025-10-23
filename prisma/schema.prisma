@@ -14,8 +14,8 @@ generator client {
 // ENUMS
 // ----------------------------------------------------
 enum Role {
-  ADMIN
   STUDENT
+  ADMIN
 }
 
 enum Difficulty {
@@ -34,16 +34,13 @@ enum ChallengeStatus {
 // MODELS
 // ----------------------------------------------------
 model User {
-  id          Int        @id @default(autoincrement())
-  name        String
-  email       String     @unique
-  password    String
-  role        Role       @default(STUDENT)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  // Relaciones
-  challenges  Challenge[] @relation("ChallengeCreator")
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Challenge {
