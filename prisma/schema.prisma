@@ -1,0 +1,78 @@
+// ----------------------------------------------------
+// PRISMA SCHEMA - PRIMERA ENTREGA
+// ----------------------------------------------------
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ----------------------------------------------------
+// ENUMS
+// ----------------------------------------------------
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum ChallengeStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// ----------------------------------------------------
+// MODELS
+// ----------------------------------------------------
+model User {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String     @unique
+  password    String
+  role        Role       @default(STUDENT)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relaciones
+  challenges  Challenge[] @relation("ChallengeCreator")
+}
+
+model Challenge {
+  id            Int             @id @default(autoincrement())
+  title         String
+  description   String
+  difficulty    Difficulty       @default(EASY)
+  tags          String[]         // se almacenan como array en PostgreSQL
+  timeLimit     Int              // milisegundos
+  memoryLimit   Int              // MB
+  status        ChallengeStatus  @default(DRAFT)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  // Relaciones
+  creatorId     Int
+  creator       User             @relation("ChallengeCreator", fields: [creatorId], references: [id])
+  testCases     TestCase[]       @relation("ChallengeCases")
+}
+
+model TestCase {
+  id           Int        @id @default(autoincrement())
+  input        String     // contenido del archivo .in
+  expected     String     // contenido del archivo .out
+  isPublic     Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relaciones
+  challengeId  Int
+  challenge    Challenge  @relation("ChallengeCases", fields: [challengeId], references: [id])
+}
