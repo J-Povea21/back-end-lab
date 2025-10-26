@@ -5,8 +5,8 @@ import { DeleteChallengeUsecase } from '../../core/application/usecases/delete-c
 import { GetChallengeUsecase } from '../../core/application/usecases/get-challenge.usecases';
 import { ListsChallengeUsecase } from '../../core/application/usecases/lists-challenge.usecases';
 import { PrismaChallengeRepository } from 'src/challenge/infrastructure/prisma/prisma-challenge.repository';
+import { PrismaModule } from '@common/prisma/prisma.module';
 import { Module } from '@nestjs/common';
-import { PrismaService } from 'src/challenge/infrastructure/database/prisma.service';
 
 @Module({
     controllers: [ChallengesController],
@@ -19,6 +19,6 @@ import { PrismaService } from 'src/challenge/infrastructure/database/prisma.serv
         DeleteChallengeUsecase, 
         GetChallengeUsecase, 
         ListsChallengeUsecase],
-    imports: [PrismaService],
+    imports: [PrismaModule],
 })
 export class ChallengesHttpModule {}

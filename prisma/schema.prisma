@@ -15,6 +15,7 @@ generator client {
 // ----------------------------------------------------
 enum Role {
   STUDENT
+  PROFESSOR
   ADMIN
 }
 
@@ -30,6 +31,22 @@ enum ChallengeStatus {
   ARCHIVED
 }
 
+enum SubmissionStatus {
+  QUEUED       // To be executed
+  RUNNING      
+  COMPLETED    
+  FAILED       
+}
+
+enum Verdict {
+  ACCEPTED              // All test cases passed
+  WRONG_ANSWER          // Wrong output
+  TIME_LIMIT_EXCEEDED   
+  MEMORY_LIMIT_EXCEEDED 
+  RUNTIME_ERROR         
+  COMPILATION_ERROR
+}
+
 // ----------------------------------------------------
 // MODELS
 // ----------------------------------------------------
@@ -41,35 +58,180 @@ model User {
   role      Role     @default(STUDENT)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations - As Student
+  enrolledCourses   Course[]     @relation("CourseStudents")
+  submissions       Submission[] @relation("UserSubmissions")
+  
+  // Relations - As Professor/Admin
+  taughtCourses     Course[]     @relation("CourseProfessors")
+  createdChallenges Challenge[]  @relation("ChallengeCreator")
+  createdEvaluations Evaluation[] @relation("EvaluationCreator")
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  name        String   
+  code        String   @unique // e.g., "NRC 12345"
+  period      String   // e.g., "2025-1"
+  group       String?  // e.g., "1"
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  professors  User[]        @relation("CourseProfessors")
+  students    User[]        @relation("CourseStudents")
+  
+  challenges  Challenge[]   @relation("CourseChallenges")
+  evaluations Evaluation[]  @relation("CourseEvaluations")
+  submissions Submission[]  @relation("CourseSubmissions")
+
+  @@index([code])
+  @@index([isActive])
 }
 
 model Challenge {
   id            Int             @id @default(autoincrement())
   title         String
   description   String
-  difficulty    Difficulty       @default(EASY)
-  tags          String[]         // se almacenan como array en PostgreSQL
-  timeLimit     Int              // milisegundos
-  memoryLimit   Int              // MB
-  status        ChallengeStatus  @default(DRAFT)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+  difficulty    Difficulty      @default(EASY)
+  tags          String[]        // Arrays in PostgreSQL
+  timeLimit     Int             // milliseconds
+  memoryLimit   Int             // MB
+  status        ChallengeStatus @default(DRAFT)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 
-  // Relaciones
-  creatorId     Int
-  creator       User             @relation("ChallengeCreator", fields: [creatorId], references: [id])
-  testCases     TestCase[]       @relation("ChallengeCases")
+  // Relations
+  courseId      String
+  course        Course          @relation("CourseChallenges", fields: [courseId], references: [id], onDelete: Cascade)
+  
+  creatorId     String
+  creator       User            @relation("ChallengeCreator", fields: [creatorId], references: [id])
+  
+  testCases     TestCase[]      @relation("ChallengeCases")
+  submissions   Submission[]    @relation("ChallengeSubmissions")
+  evaluationChallenges EvaluationChallenge[] @relation("ChallengeEvaluations")
+
+  @@index([courseId])
+  @@index([creatorId])
+  @@index([status])
 }
 
 model TestCase {
-  id           Int        @id @default(autoincrement())
-  input        String     // contenido del archivo .in
-  expected     String     // contenido del archivo .out
-  isPublic     Boolean    @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id           Int          @id @default(autoincrement())
+  input        String       // content of .in
+  expected     String       // content of .out
+  isPublic     Boolean      @default(false) // Public test cases are visible to students
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
-  // Relaciones
+  // Relations
   challengeId  Int
-  challenge    Challenge  @relation("ChallengeCases", fields: [challengeId], references: [id])
+  challenge    Challenge    @relation("ChallengeCases", fields: [challengeId], references: [id], onDelete: Cascade)
+  testResults  TestResult[] @relation("TestCaseResults")
+
+  @@index([challengeId])
+}
+
+model Submission {
+  id            String           @id @default(uuid())
+  code          String           // The submitted code
+  language      String           // e.g., "python", "javascript", "cpp", "java"
+  status        SubmissionStatus @default(QUEUED)
+  verdict       Verdict?         
+  score         Int?             // Score out of 100
+  executionTime Int?             // milliseconds (total time)
+  memoryUsed    Int?             // MB (peak memory)
+  errorMessage  String?          // For compilation/runtime errors
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  // Relations
+  userId        String
+  user          User             @relation("UserSubmissions", fields: [userId], references: [id])
+  
+  challengeId   Int
+  challenge     Challenge        @relation("ChallengeSubmissions", fields: [challengeId], references: [id])
+  
+  courseId      String
+  course        Course           @relation("CourseSubmissions", fields: [courseId], references: [id])
+  
+  evaluationId  String?          // null if not part of an evaluation
+  evaluation    Evaluation?      @relation("EvaluationSubmissions", fields: [evaluationId], references: [id])
+  
+  testResults   TestResult[]     @relation("SubmissionResults")
+
+  @@index([userId])
+  @@index([challengeId])
+  @@index([courseId])
+  @@index([evaluationId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model TestResult {
+  id            Int        @id @default(autoincrement())
+  passed        Boolean
+  executionTime Int?       // milliseconds for this specific test
+  memoryUsed    Int?       // MB for this specific test
+  output        String?    // Actual output (for debugging)
+  errorMessage  String?    // If this specific test failed
+  createdAt     DateTime   @default(now())
+
+  // Relations
+  submissionId  String
+  submission    Submission @relation("SubmissionResults", fields: [submissionId], references: [id], onDelete: Cascade)
+  
+  testCaseId    Int
+  testCase      TestCase   @relation("TestCaseResults", fields: [testCaseId], references: [id])
+
+  @@index([submissionId])
+  @@index([testCaseId])
+}
+
+model Evaluation {
+  id          String    @id @default(uuid())
+  name        String    // e.g., "Parcial 1 - Estructuras de Datos"
+  description String?
+  startTime   DateTime  // When the evaluation starts
+  endTime     DateTime  // When it closes automatically
+  duration    Int       // Duration in minutes
+  maxAttempts Int?      // Max submissions per challenge (null = unlimited)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  courseId    String
+  course      Course    @relation("CourseEvaluations", fields: [courseId], references: [id], onDelete: Cascade)
+  
+  creatorId   String
+  creator     User      @relation("EvaluationCreator", fields: [creatorId], references: [id])
+  
+  evaluationChallenges EvaluationChallenge[] @relation("EvaluationChallengeList")
+  submissions          Submission[]          @relation("EvaluationSubmissions")
+
+  @@index([courseId])
+  @@index([creatorId])
+  @@index([startTime])
+  @@index([endTime])
+}
+
+model EvaluationChallenge {
+  id            String     @id @default(uuid())
+  points        Int        @default(100) // Points for this challenge in this evaluation
+  order         Int        // Display order
+  
+  evaluationId  String
+  evaluation    Evaluation @relation("EvaluationChallengeList", fields: [evaluationId], references: [id], onDelete: Cascade)
+  
+  challengeId   Int
+  challenge     Challenge  @relation("ChallengeEvaluations", fields: [challengeId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime   @default(now())
+
+  @@unique([evaluationId, challengeId])
+  @@index([evaluationId])
+  @@index([challengeId])
 }

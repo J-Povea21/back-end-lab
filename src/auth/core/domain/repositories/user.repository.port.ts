@@ -7,9 +7,9 @@ export interface CreateUserDTO {
   role: 'STUDENT' | 'ADMIN';
 }
 
-export interface UserRepositoryPort {
-  findById(id: string): Promise<User | null>;
-  findByEmail(email: string): Promise<User | null>;
-  create(data: CreateUserDTO): Promise<User>;
-  delete(id: string): Promise<void>;
+export abstract class UserRepositoryPort {
+  abstract findById(id: string): Promise<User | null>;
+  abstract findByEmail(email: string): Promise<User | null>;
+  abstract create(data: CreateUserDTO): Promise<User>;
+  abstract delete(id: string): Promise<void>;
 }

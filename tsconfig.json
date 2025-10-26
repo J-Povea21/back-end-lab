@@ -11,6 +11,12 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "@common/*": ["src/common/*"],
+      "@submission/*": ["src/submission/*"],
+      "@challenge/*": ["src/challenge/*"],
+      "@auth/*": ["src/auth/*"]
+    }
   }
 }

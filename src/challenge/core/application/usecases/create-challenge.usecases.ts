@@ -17,7 +17,8 @@ export class CreateChallengeUsecase {
             input.timeLimit, 
             input.memoryLimit, 
             input.status as ChallengeStatus, 
-            input.creatorId);
+            input.creatorId,
+            input.courseId);
 
         return await this.challengeRepository.create(challenge);
     }

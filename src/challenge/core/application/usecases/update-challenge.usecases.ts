@@ -17,6 +17,7 @@ export class UpdateChallengeUsecase {
         challenge.timeLimit = input.timeLimit;
         challenge.memoryLimit = input.memoryLimit;
         challenge.status = input.status;
+        challenge.courseId = input.courseId;
         await this.challengeRepository.update(challenge);
         return challenge;
     }
