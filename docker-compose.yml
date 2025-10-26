@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16
@@ -18,17 +16,53 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  backend:
+
+  redis:
+    image: redis:7-alpine
+    container_name: clean_nest_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  migrations:
+    build: .
+    container_name: clean_nest_migrations
+    environment:
+      DATABASE_URL: "postgresql://user:pass@db:5432/clean_nest"
+    command: npx prisma migrate deploy
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  api:
     build: .
     container_name: clean_nest_api
     environment:
       DATABASE_URL: "postgresql://user:pass@db:5432/clean_nest"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      NODE_ENV: production
     ports:
       - "3000:3000"
+    command: npm run start
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
     restart: unless-stopped
+
 
 volumes:
   db_data:
+  redis_data:

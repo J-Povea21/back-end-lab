@@ -17,6 +17,7 @@ class CreateChallengeRequest {
   @ApiProperty() timeLimit!: number;
   @ApiProperty() memoryLimit!: number;
   @ApiProperty() status!: ChallengeStatus;
+  @ApiProperty() courseId!: string;
 }
 
 @ApiTags('challenges')

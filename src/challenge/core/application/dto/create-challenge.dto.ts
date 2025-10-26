@@ -9,5 +9,6 @@ export class CreateChallengeDto {
     timeLimit: number;
     memoryLimit: number;
     status: ChallengeStatus;
-    creatorId: number;
+    creatorId: string;
+    courseId: string;
 }

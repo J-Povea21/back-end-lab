@@ -1,19 +1,19 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './user.controller';
-import { RegisterUserUseCase } from '../../../core/application/usecases/register-user.usecase';
-import { LoginUserUseCase } from '../../../core/application/usecases/login-user.usecase';
-import { PrismaUserRepository } from '../../../infrastructure/prisma/prisma-user.repository';
-import { PrismaService } from '../../../infrastructure/prisma/prisma.service';
-import { AuthModule } from '../../../infrastructure/auth/auth.module';
-import { USER_REPOSITORY } from '../../../core/application/tokens';
+import { RegisterUserUseCase } from '@auth/core/application/usecases/register-user.usecase';
+import { LoginUserUseCase } from '@auth/core/application/usecases/login-user.usecase';
+import { PrismaUserRepository } from '@auth/infrastructure/prisma/prisma-user.repository';
+import { UserRepositoryPort } from '@auth/core/domain/repositories/user.repository.port';
+import { AuthModule } from '@auth/infrastructure/auth/auth.module';
+import { User } from '@auth/core/domain/entities/user.entity';
+import { PrismaModule } from '@common/prisma/prisma.module';
 
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, PrismaModule],
   controllers: [UsersController],
   providers: [
-      PrismaService,
       {
-        provide: USER_REPOSITORY,
+        provide: UserRepositoryPort,
         useClass: PrismaUserRepository,
       },
       RegisterUserUseCase,

@@ -12,5 +12,6 @@ export const toChallengeDto = (challenge: Challenge): ChallengeDto => {
         memoryLimit: challenge.memoryLimit,
         status: challenge.status,
         creatorId: challenge.creatorId,
+        courseId: challenge.courseId,
     };
 };

@@ -3,14 +3,10 @@ import * as bcrypt from 'bcrypt';
 import { UserRepositoryPort } from '../../domain/repositories/user.repository.port';
 import { RegisterUserDTO } from '../dto/register-user.dto';
 import { User } from '../../domain/entities/user.entity';
-import { USER_REPOSITORY } from '../../application/tokens';
 
 @Injectable()
 export class RegisterUserUseCase {
-  constructor(
-    @Inject(USER_REPOSITORY)
-    private readonly userRepo: UserRepositoryPort,
-  ) {}
+  constructor(private readonly userRepo: UserRepositoryPort) {}
 
   async execute(data: RegisterUserDTO): Promise<User> {
     const existing = await this.userRepo.findByEmail(data.email);
