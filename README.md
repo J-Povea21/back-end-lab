@@ -422,16 +422,11 @@ docker-compose exec redis redis-cli ping
 This is an academic project for the Backend Development course at Universidad del Norte.
 
 **Team Members:**
-- [Your Name]
-- [Team Member 2]
-- [Team Member 3]
+- Juan Andrés Povea
+- Yovany Zhu Ye
+- Gabriel Palencia Cure
 
-## 📝 License
-
-This project is part of an academic assignment.
-
----
 
 **Course:** Desarrollo de Aplicaciones Backend  
 **Institution:** Universidad del Norte  
-**Semester:** 2025-1
+**Semester:** 2025-2
