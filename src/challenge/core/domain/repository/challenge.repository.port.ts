@@ -1,9 +1,9 @@
 import { Challenge } from "../entity/challenge.entity";
 
-export interface ChallengeRepositoryPort {
-    create(challenge: Challenge): Promise<Challenge>;
-    findById(id: number): Promise<Challenge | null>;
-    findAll(): Promise<Challenge[]>;
-    update(challenge: Challenge): Promise<Challenge>;
-    delete(id: number): Promise<void>;
+export abstract class ChallengeRepositoryPort {
+    abstract create(challenge: Challenge): Promise<Challenge>;
+    abstract findById(id: number): Promise<Challenge | null>;
+    abstract findAll(): Promise<Challenge[]>;
+    abstract update(challenge: Challenge): Promise<Challenge>;
+    abstract delete(id: number): Promise<void>;
 }

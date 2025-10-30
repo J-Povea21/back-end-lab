@@ -1,9 +1,11 @@
+import { Injectable } from "@nestjs/common";
 import { ChallengeRepositoryPort } from "../../core/domain/repository/challenge.repository.port";
 import { Challenge } from "../../core/domain/entity/challenge.entity";
 import { PrismaService } from "@common/prisma/prisma.service";
 import { ChallengeDifficulty } from "../../core/domain/enums/challenge-difficulty";
 import { ChallengeStatus } from "../../core/domain/enums/challenge-status";
 
+@Injectable()
 export class PrismaChallengeRepository implements ChallengeRepositoryPort {
     constructor(private readonly prisma: PrismaService) {}
     

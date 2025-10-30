@@ -1,9 +1,11 @@
+import { Injectable } from "@nestjs/common";
 import { CreateChallengeDto } from "../dto/create-challenge.dto";
 import { ChallengeRepositoryPort } from "../../domain/repository/challenge.repository.port";
 import { Challenge } from "../../domain/entity/challenge.entity";
 import { ChallengeDifficulty } from "../../domain/enums/challenge-difficulty";
 import { ChallengeStatus } from "../../domain/enums/challenge-status";
 
+@Injectable()
 export class CreateChallengeUsecase {
     constructor(private readonly challengeRepository: ChallengeRepositoryPort) {}
 

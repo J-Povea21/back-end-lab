@@ -1,6 +1,8 @@
+import { Injectable } from "@nestjs/common";
 import { ChallengeRepositoryPort } from "../../domain/repository/challenge.repository.port";
 import { Challenge } from "../../domain/entity/challenge.entity";
 
+@Injectable()
 export class GetChallengeUsecase {
     constructor(private readonly challengeRepository: ChallengeRepositoryPort) {}
 

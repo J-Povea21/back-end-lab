@@ -6,12 +6,13 @@ import { GetChallengeUsecase } from '../../core/application/usecases/get-challen
 import { ListsChallengeUsecase } from '../../core/application/usecases/lists-challenge.usecases';
 import { PrismaChallengeRepository } from 'src/challenge/infrastructure/prisma/prisma-challenge.repository';
 import { PrismaModule } from '@common/prisma/prisma.module';
+import { ChallengeRepositoryPort } from '../../core/domain/repository/challenge.repository.port';
 import { Module } from '@nestjs/common';
 
 @Module({
     controllers: [ChallengesController],
     providers: [{
-        provide: 'ChallengeRepositoryPort',
+        provide: ChallengeRepositoryPort,
         useClass: PrismaChallengeRepository,
     },
         CreateChallengeUsecase, 

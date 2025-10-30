@@ -1,5 +1,7 @@
+import { Injectable } from "@nestjs/common";
 import { ChallengeRepositoryPort } from "../../domain/repository/challenge.repository.port";
 
+@Injectable()
 export class DeleteChallengeUsecase {
     constructor(private readonly challengeRepository: ChallengeRepositoryPort) {}
 
